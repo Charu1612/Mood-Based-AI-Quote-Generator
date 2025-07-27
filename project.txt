@@ -1,0 +1,25 @@
+# ✅ STEP 1: Install required libraries
+!pip install -q transformers accelerate
+# ✅ STEP 2: Import and load the model
+from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+
+# Load Falcon-RW-1B (small, works on CPU)
+model_name = "tiiuae/falcon-rw-1b"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForCausalLM.from_pretrained(model_name)
+
+# Create text generation pipeline
+generator = pipeline("text-generation", model=model, tokenizer=tokenizer)
+# ✅ STEP 3: Define the quote generation function
+def generate_quote(mood):
+    prompt = f"Give me a short inspirational quote for someone who feels {mood}."
+    result = generator(prompt, max_length=60, do_sample=True, temperature=0.9, top_k=50)
+    quote = result[0]["generated_text"].replace(prompt, "").strip()
+    return quote
+# ✅ STEP 4: Get user mood and show quote
+print("🎭 Welcome to the Mood-Based AI Quote Generator 🎭")
+mood = input("Enter your current mood (e.g., sad, anxious, grateful, excited): ").strip()
+
+print("\n✨ Here's a quote for you:\n")
+quote = generate_quote(mood)
+print(f"📝 \"{quote}\"")
